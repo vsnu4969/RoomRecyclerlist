@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,11 +19,10 @@ import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity implements NotesAdapter.OnNoteItemClick {
 
-    TextView textViewMsg;
-    RecyclerView recyclerView;
+    private TextView textViewMsg;
+    private RecyclerView recyclerView;
     private List<Note> notes;
     private NotesAdapter notesAdapter;
-    private int clickedPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,9 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
     @Override
     protected void onResume() {
         super.onResume();
+        TraceLog.entryLog();
         displayList();
+        TraceLog.exitLog();
     }
 
     private void displayList() {
@@ -43,41 +45,52 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
 
     @Override
     public void onNoteClick(Note note, int clickedPosition) {
-        this.clickedPosition = clickedPosition;
         RemoveTask removeTask = new RemoveTask(this);
         removeTask.execute(note);
     }
 
     private class RetrieveTask extends AsyncTask<Void, Void, List<Note>> {
 
-        private NoteDatabase noteDatabase;
+
         private Context context;
 
         RetrieveTask(Context context) {
             this.context = context;
-            noteDatabase = NoteDatabase.getInstance(context);
         }
 
         @Override
         protected List<Note> doInBackground(Void... voids) {
+            TraceLog.entryLog();
+            NoteDatabase noteDatabase = NoteDatabase.getInstance(context);
+            TraceLog.exitLog();
             return noteDatabase.noteDao().getAll();
         }
 
         @Override
         protected void onPostExecute(List<Note> notes) {
-            if (notes != null && notes.size() > 0) {
-                textViewMsg.setVisibility(View.GONE);
-                notesAdapter = new NotesAdapter(notes, NoteListActivity.this);
-                recyclerView.setAdapter(notesAdapter);
-            } else {
-                recyclerView.setVisibility(View.GONE);
-                textViewMsg.setVisibility(View.VISIBLE);
-            }
+            TraceLog.entryLog();
+            updateList(notes);
+            TraceLog.exitLog();
         }
 
     }
 
-    private class RemoveTask extends AsyncTask<Note, Void, Void> {
+    private void updateList(List<Note> notes) {
+        TraceLog.entryLog();
+        TraceLog.log(Log.INFO, "List", "size : "
+                + (notes != null ? notes.size() : 0));
+        if (notes != null && !notes.isEmpty()) {
+            textViewMsg.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            notesAdapter.setList(notes);
+        } else {
+            recyclerView.setVisibility(View.GONE);
+            textViewMsg.setVisibility(View.VISIBLE);
+        }
+        TraceLog.exitLog();
+    }
+
+    private class RemoveTask extends AsyncTask<Note, Void, Note> {
 
         private NoteDatabase noteDatabase;
         private Context context;
@@ -88,21 +101,28 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         }
 
         @Override
-        protected Void doInBackground(Note... notes) {
-            noteDatabase.noteDao().delete(notes[0]);
-            return null;
+        protected Note doInBackground(Note... notes) {
+            TraceLog.entryLog();
+            Note note = notes[0];
+            noteDatabase.noteDao().delete(note);
+            TraceLog.exitLog();
+            return note;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            notesAdapter.notifyItemRemoved(clickedPosition);
-            displayList();
+        protected void onPostExecute(Note note) {
+            TraceLog.entryLog();
+            notesAdapter.removeItem(note);
+            List<Note> list = notesAdapter.getList();
+            if (list == null || list.isEmpty())
+                updateList(null);
+            TraceLog.exitLog();
         }
     }
 
     private void initUI() {
-        textViewMsg = (TextView) findViewById(R.id.text_list_empty);
-        // Action button to add note
+        TraceLog.entryLog();
+        textViewMsg = findViewById(R.id.text_list_empty);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingactionbar_addnote);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,6 +133,9 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         });
         recyclerView = findViewById(R.id.recylerview_notelist);
         recyclerView.setLayoutManager(new LinearLayoutManager(NoteListActivity.this));
+        notesAdapter = new NotesAdapter(NoteListActivity.this);
+        recyclerView.setAdapter(notesAdapter);
+        TraceLog.exitLog();
     }
 
     @Override
