@@ -1,3 +1,11 @@
+/**
+ * Package : com.example.vichu.roomrecyclerlist
+ * File Name: NoteListActivity.java
+ * Brief: NoteListActivity which is used to show the note list
+ * RoomRecyclerList Project is Strictly Used for Study Purpose Only
+ * Author : Vishnu Muraleedharan.
+ **/
+
 package com.example.vichu.roomrecyclerlist;
 
 import android.content.Context;
@@ -12,25 +20,36 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
 
+/**
+ * @brief NoteListActivity which is used to show the note list.
+ */
 public class NoteListActivity extends AppCompatActivity implements NotesAdapter.OnNoteItemClick {
-
+   LinearLayout linearLayout;
     private TextView textViewMsg;
     private RecyclerView recyclerView;
     private List<Note> notes;
     private NotesAdapter notesAdapter;
 
+    /**
+     * @brief oncreate for NoteListActivity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_list_activity);
+        linearLayout=findViewById(R.id.linear_recycler_list_no_note);
         initUI();
     }
 
+    /**
+     * @brief onresume for NoteListActivity.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -39,6 +58,9 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         TraceLog.exitLog();
     }
 
+    /**
+     * @brief retreive data from the Room database and shows it using asynctask.
+     */
     private void displayList() {
         new RetrieveTask(this).execute();
     }
@@ -68,40 +90,50 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
 
         @Override
         protected void onPostExecute(List<Note> notes) {
-<<<<<<< HEAD
+
             TraceLog.entryLog();
             updateList(notes);
-            TraceLog.exitLog();
-=======
+
             if (notes != null && notes.size() > 0) {
                 textViewMsg.setVisibility(View.GONE);
-                notesAdapter = new NotesAdapter(notes, NoteListActivity.this);
+                notesAdapter = new NotesAdapter(NoteListActivity.this);
                 recyclerView.setAdapter(notesAdapter);
                 recyclerView.setVisibility(View.VISIBLE);
             } else {
                 recyclerView.setVisibility(View.GONE);
                 textViewMsg.setVisibility(View.VISIBLE);
             }
->>>>>>> 755ec43d4092309b7c15bd75fe0301f072a64692
+
+            TraceLog.entryLog();
+            updateList(notes);
+            TraceLog.exitLog();
+
+
         }
 
     }
 
+/**
+ * @brief updating the list when no element vs when there is an element present.
+ */
     private void updateList(List<Note> notes) {
         TraceLog.entryLog();
         TraceLog.log(Log.INFO, "List", "size : "
                 + (notes != null ? notes.size() : 0));
         if (notes != null && !notes.isEmpty()) {
-            textViewMsg.setVisibility(View.GONE);
+            linearLayout.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             notesAdapter.setList(notes);
         } else {
             recyclerView.setVisibility(View.GONE);
-            textViewMsg.setVisibility(View.VISIBLE);
+            linearLayout.setVisibility(View.VISIBLE);
         }
         TraceLog.exitLog();
     }
 
+    /**
+     * @brief remove data from the Room database and shows it using asynctask.
+     */
     private class RemoveTask extends AsyncTask<Note, Void, Note> {
 
         private NoteDatabase noteDatabase;
@@ -132,6 +164,9 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         }
     }
 
+    /**
+     * @brief initialising Ui by setting recycler view.
+     */
     private void initUI() {
         TraceLog.entryLog();
         textViewMsg = findViewById(R.id.text_list_empty);
@@ -150,6 +185,10 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         TraceLog.exitLog();
     }
 
+    /**
+     * @brief setting the menu inflater.
+     *
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -157,6 +196,9 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         return true;
     }
 
+    /**
+     * @brief setting the item selected in the menu.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
