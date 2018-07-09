@@ -69,6 +69,7 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
                 textViewMsg.setVisibility(View.GONE);
                 notesAdapter = new NotesAdapter(notes, NoteListActivity.this);
                 recyclerView.setAdapter(notesAdapter);
+                recyclerView.setVisibility(View.VISIBLE);
             } else {
                 recyclerView.setVisibility(View.GONE);
                 textViewMsg.setVisibility(View.VISIBLE);
