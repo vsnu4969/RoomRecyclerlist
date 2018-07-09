@@ -1,3 +1,12 @@
+/**
+ * Package : com.example.vichu.roomrecyclerlist
+ * File Name: NoteAddActivity.java
+ * Brief: NoteAddActivity which is used to add and update the note list
+ * RoomRecyclerList Project is Strictly Used for Study Purpose Only
+ * Author : Vishnu Muraleedharan.
+ **/
+
+
 package com.example.vichu.roomrecyclerlist;
 
 import android.content.Intent;
@@ -11,11 +20,18 @@ import android.widget.EditText;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 
+/**
+ * @brief   NoteAddActivity which is used to add and update the note list.
+ *
+ */
 public class NoteAddActivity extends AppCompatActivity {
     private EditText et_title,et_content;
     private NoteDatabase noteDatabase;
     private Note note;
 
+    /**
+     * @brief oncreate for the NoteAddActivity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +53,17 @@ public class NoteAddActivity extends AppCompatActivity {
 
     }
 
-//    private void setResult(Note note, int flag){
-//        setResult(flag,new Intent().putExtra("note", (Serializable) note));
-//        finish();
-//    }
+    /**
+     * @brief setting the result for the NoteAddActivity.
+     */
+    private void setResult(Note note, int flag){
+        setResult(flag,new Intent().putExtra("note", (Serializable) note));
+        finish();
+    }
 
+    /**
+     * @brief inserting note in the database using asynctask.
+     */
     private static class InsertTask extends AsyncTask<Void,Void,Boolean> {
 
         private WeakReference<NoteAddActivity> activityReference;

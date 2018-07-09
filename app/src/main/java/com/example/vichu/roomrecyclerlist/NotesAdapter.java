@@ -8,7 +8,6 @@
 
 package com.example.vichu.roomrecyclerlist;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,19 +19,24 @@ import java.util.List;
 class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
 
     private List<Note> list;
-    private Context context;
     private OnNoteItemClick onNoteItemClick;
 
-    public NotesAdapter(List<Note> list, NoteListActivity activity) {
+    public List<Note> getList() {
+        return list;
+    }
+
+    public void setList(List<Note> list) {
         this.list = list;
-        this.onNoteItemClick = (OnNoteItemClick) activity;
-        this.context = activity;
+        notifyDataSetChanged();
+    }
+
+    public NotesAdapter(NoteListActivity activity) {
+        this.onNoteItemClick = activity;
     }
 
     @Override
     public NotesViewholder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater;
-        inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.note_list_view, parent, false);
         NotesViewholder viewholder = new NotesViewholder(view);
         return viewholder;
@@ -45,7 +49,24 @@ class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return list != null
+                ? list.size()
+                : 0;
+    }
+
+    public void removeItem(Note note) {
+        int position = getPosition(note);
+        list.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    private int getPosition(Note note) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getData_id() == note.getData_id()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public class NotesViewholder extends RecyclerView.ViewHolder implements View.OnLongClickListener {

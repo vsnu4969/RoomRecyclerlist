@@ -50,7 +50,7 @@ import java.util.List;
      * @param note, array of objects to be deleted
      */
     @Delete
-    void delete(Note... note);      // Note... is varargs, here note is an array
+    void deleteMultiple(Note... note);      // Note... is varargs, here note is an array
 
 
 }
