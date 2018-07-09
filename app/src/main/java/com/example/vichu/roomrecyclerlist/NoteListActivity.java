@@ -68,9 +68,21 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
 
         @Override
         protected void onPostExecute(List<Note> notes) {
+<<<<<<< HEAD
             TraceLog.entryLog();
             updateList(notes);
             TraceLog.exitLog();
+=======
+            if (notes != null && notes.size() > 0) {
+                textViewMsg.setVisibility(View.GONE);
+                notesAdapter = new NotesAdapter(notes, NoteListActivity.this);
+                recyclerView.setAdapter(notesAdapter);
+                recyclerView.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.GONE);
+                textViewMsg.setVisibility(View.VISIBLE);
+            }
+>>>>>>> 755ec43d4092309b7c15bd75fe0301f072a64692
         }
 
     }

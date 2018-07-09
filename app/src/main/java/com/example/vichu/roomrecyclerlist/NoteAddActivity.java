@@ -37,10 +37,10 @@ public class NoteAddActivity extends AppCompatActivity {
 
     }
 
-    private void setResult(Note note, int flag){
-        setResult(flag,new Intent().putExtra("note", (Serializable) note));
-        finish();
-    }
+//    private void setResult(Note note, int flag){
+//        setResult(flag,new Intent().putExtra("note", (Serializable) note));
+//        finish();
+//    }
 
     private static class InsertTask extends AsyncTask<Void,Void,Boolean> {
 
