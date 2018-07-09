@@ -1,4 +1,4 @@
-package com.example.vichu.roomrecyclerlist;
+package com.example.vichu.roomrecyclerlist.log;
 
 import android.util.Log;
 

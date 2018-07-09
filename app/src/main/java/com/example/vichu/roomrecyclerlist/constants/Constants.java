@@ -6,7 +6,7 @@
 * Author : Vishnu Muraleedharan.
 **/
 
-package com.example.vichu.roomrecyclerlist;
+package com.example.vichu.roomrecyclerlist.constants;
 
  final public class Constants   {
     public Constants() {

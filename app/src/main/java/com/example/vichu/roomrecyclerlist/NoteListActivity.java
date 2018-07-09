@@ -24,6 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vichu.roomrecyclerlist.RoomDatabase.Note;
+import com.example.vichu.roomrecyclerlist.RoomDatabase.NoteDatabase;
+import com.example.vichu.roomrecyclerlist.adapter.NotesAdapter;
+import com.example.vichu.roomrecyclerlist.log.TraceLog;
+
 import java.util.List;
 
 /**
