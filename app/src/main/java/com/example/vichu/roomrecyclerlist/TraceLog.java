@@ -1,7 +1,20 @@
+/**
+ * Package : com.example.vichu.roomrecyclerlist
+ * File Name: TraceLog.java
+ * Brief: Used to get Tracelog functionalities
+ * RoomRecyclerList Project is Strictly Used for Study Purpose Only.
+ * Author : Vishnu Muraleedharan.
+ **/
+
 package com.example.vichu.roomrecyclerlist;
 
 import android.util.Log;
 
+
+/**
+ * @brief    Used to get Tracelog functionalities.
+ *
+ */
 public class TraceLog {
 
     private static final String TAG = "[VISHNU] ";
