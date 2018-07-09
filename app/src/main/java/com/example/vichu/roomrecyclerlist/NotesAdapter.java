@@ -1,10 +1,10 @@
 /**
-* Package : com.example.vichu.roomrecyclerlist
-* File Name: NotesAdapter.java
-* Brief: RecyclerAdapter which is used to establish the view for the Ui
-* RoomRecyclerList Project is Strictly Used for Study Purpose Only
-* Author : Vishnu Muraleedharan.
-**/
+ * Package : com.example.vichu.roomrecyclerlist
+ * File Name: NotesAdapter.java
+ * Brief: RecyclerAdapter which is used to establish the view for the Ui
+ * RoomRecyclerList Project is Strictly Used for Study Purpose Only
+ * Author : Vishnu Muraleedharan.
+ **/
 
 package com.example.vichu.roomrecyclerlist;
 
@@ -18,53 +18,63 @@ import android.widget.TextView;
 import java.util.List;
 
 class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
-   private List<Note> list;
-   private Context context;
-   private LayoutInflater inflater;
-   private OnNoteItemClick onNoteItemClick;
 
-   public NotesAdapter(List<Note> list, Context context) {
-      this.list = list;
-       inflater=LayoutInflater.from(context);
-      this.context = context;
-      this.onNoteItemClick=(OnNoteItemClick)context;
-   }
+    private List<Note> list;
+    private Context context;
+    private OnNoteItemClick onNoteItemClick;
 
-   @Override
-   public NotesViewholder onCreateViewHolder(ViewGroup parent, int viewType) {
-      View view=inflater.inflate(R.layout.note_list_view,parent);
-      NotesViewholder viewholder=new NotesViewholder(view);
-      return viewholder;
-   }
+    public NotesAdapter(List<Note> list, NoteListActivity activity) {
+        this.list = list;
+        this.onNoteItemClick = (OnNoteItemClick) activity;
+        this.context = activity;
+    }
 
-   @Override
-   public void onBindViewHolder(NotesViewholder holder, int position) {
-       holder.textViewTitle.setText(list.get(position).getTitle());
-       holder.textViewContent.setText(list.get(position).getContent());
-   }
+    @Override
+    public NotesViewholder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater;
+        inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.note_list_view, parent, false);
+        NotesViewholder viewholder = new NotesViewholder(view);
+        return viewholder;
+    }
 
-   @Override
-   public int getItemCount() {
-      return list.size();
-   }
+    @Override
+    public void onBindViewHolder(NotesViewholder holder, int position) {
+        holder.setData(list.get(position));
+    }
 
-   public class NotesViewholder extends RecyclerView.ViewHolder implements View.OnClickListener{
-       TextView textViewContent;
-       TextView textViewTitle;
+    @Override
+    public int getItemCount() {
+        return list.size();
+    }
 
-      public NotesViewholder(View itemView) {
-         super(itemView);
-          itemView.setOnClickListener(this);
-          textViewContent = itemView.findViewById(R.id.item_text);
-          textViewTitle = itemView.findViewById(R.id.tv_title);
-      }
+    public class NotesViewholder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
-       @Override
-       public void onClick(View view) {
-onNoteItemClick.onNoteClick(getAdapterPosition());
-       }
-   }
-   public interface OnNoteItemClick{
-      void onNoteClick(int pos);
-   }
+        private TextView textViewContent;
+        private TextView textViewTitle;
+        private Note note;
+
+        public NotesViewholder(View itemView) {
+            super(itemView);
+            itemView.setOnLongClickListener(this);
+            textViewContent = itemView.findViewById(R.id.item_text);
+            textViewTitle = itemView.findViewById(R.id.tv_title);
+        }
+
+        public void setData(Note note) {
+            this.note = note;
+            textViewTitle.setText(note.getTitle());
+            textViewContent.setText(note.getContent());
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            onNoteItemClick.onNoteClick(note, getAdapterPosition());
+            return true;
+        }
+    }
+
+    public interface OnNoteItemClick {
+        void onNoteClick(Note note, int position);
+    }
 }

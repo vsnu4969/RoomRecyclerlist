@@ -2,7 +2,6 @@ package com.example.vichu.roomrecyclerlist;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -57,7 +56,7 @@ public class NoteAddActivity extends AppCompatActivity {
         // doInBackground methods runs on a worker thread
         @Override
         protected Boolean doInBackground(Void... objs) {
-            activityReference.get().noteDatabase.getNoteDao().insert(note);
+            activityReference.get().noteDatabase.noteDao().insert(note);
             return true;
         }
 

@@ -1,92 +1,118 @@
 package com.example.vichu.roomrecyclerlist;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class NoteListActivity extends AppCompatActivity {
-NoteDatabase noteDatabase;
-TextView textViewMsg;
-RecyclerView recyclerView;
+public class NoteListActivity extends AppCompatActivity implements NotesAdapter.OnNoteItemClick {
+
+    TextView textViewMsg;
+    RecyclerView recyclerView;
     private List<Note> notes;
     private NotesAdapter notesAdapter;
-    private int pos;
+    private int clickedPosition;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_list_activity);
-        initializeVies();
+        initUI();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         displayList();
     }
 
-    private void displayList(){
-// initialize database instance
-        noteDatabase = NoteDatabase.getInstance(NoteListActivity.this);
-// fetch list of notes in background thread
+    private void displayList() {
         new RetrieveTask(this).execute();
     }
 
-    private static class RetrieveTask extends AsyncTask<Void,Void,List<Note>> {
+    @Override
+    public void onNoteClick(Note note, int clickedPosition) {
+        this.clickedPosition = clickedPosition;
+        RemoveTask removeTask = new RemoveTask(this);
+        removeTask.execute(note);
+    }
 
-        private WeakReference<NoteListActivity> activityReference;
+    private class RetrieveTask extends AsyncTask<Void, Void, List<Note>> {
 
-        // only retain a weak reference to the activity
-        RetrieveTask(NoteListActivity context) {
-            activityReference = new WeakReference<>(context);
+        private NoteDatabase noteDatabase;
+        private Context context;
+
+        RetrieveTask(Context context) {
+            this.context = context;
+            noteDatabase = NoteDatabase.getInstance(context);
         }
 
         @Override
         protected List<Note> doInBackground(Void... voids) {
-            if (activityReference.get()!=null)
-                return activityReference.get().noteDatabase.getNoteDao().getAll();
-            else
-                return null;
+            return noteDatabase.noteDao().getAll();
         }
 
         @Override
         protected void onPostExecute(List<Note> notes) {
-            if (notes!=null && notes.size()>0 ){
-                activityReference.get().notes = notes;
-
-                // hides empty text view
-                activityReference.get().textViewMsg.setVisibility(View.GONE);
-
-                // create and set the adapter on RecyclerView instance to display list
-                activityReference.get().notesAdapter = new NotesAdapter(notes,activityReference.get());
-                activityReference.get().recyclerView.setAdapter(activityReference.get().notesAdapter);
+            if (notes != null && notes.size() > 0) {
+                textViewMsg.setVisibility(View.GONE);
+                notesAdapter = new NotesAdapter(notes, NoteListActivity.this);
+                recyclerView.setAdapter(notesAdapter);
+            } else {
+                recyclerView.setVisibility(View.GONE);
+                textViewMsg.setVisibility(View.VISIBLE);
             }
         }
 
     }
 
-    private void initializeVies(){
+    private class RemoveTask extends AsyncTask<Note, Void, Void> {
+
+        private NoteDatabase noteDatabase;
+        private Context context;
+
+        RemoveTask(Context context) {
+            this.context = context;
+            noteDatabase = NoteDatabase.getInstance(context);
+        }
+
+        @Override
+        protected Void doInBackground(Note... notes) {
+            noteDatabase.noteDao().delete(notes[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            notesAdapter.notifyItemRemoved(clickedPosition);
+            displayList();
+        }
+    }
+
+    private void initUI() {
         textViewMsg = (TextView) findViewById(R.id.text_list_empty);
         // Action button to add note
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingactionbar_addnote);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(getApplicationContext(),NoteAddActivity.class);
+                Intent intent = new Intent(getApplicationContext(), NoteAddActivity.class);
                 startActivity(intent);
             }
         });
         recyclerView = findViewById(R.id.recylerview_notelist);
         recyclerView.setLayoutManager(new LinearLayoutManager(NoteListActivity.this));
-
     }
 
     @Override
