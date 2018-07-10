@@ -50,8 +50,9 @@ import java.util.List;
      * delete list of objects from database
      * @param note, array of objects to be deleted
      */
-    @Delete
-    void deleteMultiple(Note... note);      // Note... is varargs, here note is an array
+    @Query("DELETE FROM "+Constants.TABLE_NAME_NOTE)
+    void deleteAll();      // Note... is varargs, here note is an array
 
-
+   @Query("SELECT COUNT(*) FROM "+Constants.TABLE_NAME_NOTE)
+   int getCount();
 }

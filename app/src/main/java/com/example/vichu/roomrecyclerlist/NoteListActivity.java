@@ -39,6 +39,7 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
     private TextView textViewMsg;
     private RecyclerView recyclerView;
     private List<Note> notes;
+    private List<Note> deleteNotes;
     private NotesAdapter notesAdapter;
 
     /**
@@ -98,19 +99,6 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
 
             TraceLog.entryLog();
             updateList(notes);
-
-            if (notes != null && notes.size() > 0) {
-                textViewMsg.setVisibility(View.GONE);
-                notesAdapter = new NotesAdapter(NoteListActivity.this);
-                recyclerView.setAdapter(notesAdapter);
-                recyclerView.setVisibility(View.VISIBLE);
-            } else {
-                recyclerView.setVisibility(View.GONE);
-                textViewMsg.setVisibility(View.VISIBLE);
-            }
-
-            TraceLog.entryLog();
-            updateList(notes);
             TraceLog.exitLog();
 
 
@@ -129,6 +117,7 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
             linearLayout.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             notesAdapter.setList(notes);
+            deleteNotes=notes;
         } else {
             recyclerView.setVisibility(View.GONE);
             linearLayout.setVisibility(View.VISIBLE);
@@ -211,11 +200,32 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_about) {
-            Toast.makeText(this, "Vishnu Muraleedharan/nQuEST GLOBAL", Toast.LENGTH_LONG).show();
+        switch (id){
+            
+            case R.id.action_about:
+                Toast.makeText(this, "Vishnu Muraleedharan/nQuEST GLOBAL", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.action_delete_all:
+                DeleteAll();
+                
+        }
+        
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void DeleteAll() {
+
+        NoteDatabase noteDatabase=NoteDatabase.getInstance(this);
+        if(noteDatabase.noteDao().getCount()> 0) {
+            noteDatabase.noteDao().deleteAll();
+            displayList();
+            Toast.makeText(this, " All notes Deleted", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(this, " Nothing to Delete.", Toast.LENGTH_SHORT).show();
+
         }
 
-        return super.onOptionsItemSelected(item);
+
     }
 }
