@@ -6,12 +6,14 @@
  * Author : Vishnu Muraleedharan.
  **/
 
-package com.example.vichu.roomrecyclerlist;
+package com.example.vichu.roomrecyclerlist.RoomDatabase;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
+
+import com.example.vichu.roomrecyclerlist.constants.Constants;
 
 /**
  *

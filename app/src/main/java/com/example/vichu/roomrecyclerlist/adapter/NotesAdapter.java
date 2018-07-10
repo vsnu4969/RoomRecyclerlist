@@ -6,7 +6,7 @@
  * Author : Vishnu Muraleedharan.
  **/
 
-package com.example.vichu.roomrecyclerlist;
+package com.example.vichu.roomrecyclerlist.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,13 +14,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.vichu.roomrecyclerlist.NoteListActivity;
+import com.example.vichu.roomrecyclerlist.R;
+import com.example.vichu.roomrecyclerlist.RoomDatabase.Note;
+
 import java.util.List;
 
-class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
+/**
+ * @brief   RecyclerAdapter which is used to establish the view for the Ui.
+ *
+ */
+public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
 
+    /**
+     * @brief list of the class Note entity.
+     */
     private List<Note> list;
+
+    /**
+     * @brief Interface Object.
+     */
     private OnNoteItemClick onNoteItemClick;
 
+    /**
+     * @brief Method which contains return type Note list.
+     */
     public List<Note> getList() {
         return list;
     }
@@ -34,6 +52,10 @@ class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
         this.onNoteItemClick = activity;
     }
 
+    /**
+     * @brief creating the inflater for the recycler view.
+     *
+     */
     @Override
     public NotesViewholder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -42,11 +64,17 @@ class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
         return viewholder;
     }
 
+    /**
+     * @brief onbind view holder, setting the elements.
+     */
     @Override
     public void onBindViewHolder(NotesViewholder holder, int position) {
         holder.setData(list.get(position));
     }
 
+    /**
+     * @brief list size.
+     */
     @Override
     public int getItemCount() {
         return list != null
@@ -54,12 +82,18 @@ class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
                 : 0;
     }
 
+    /**
+     * @brief remove item.
+     */
     public void removeItem(Note note) {
         int position = getPosition(note);
         list.remove(position);
         notifyItemRemoved(position);
     }
 
+    /**
+     * @brief getting the curretn position when clicked in the list.
+     */
     private int getPosition(Note note) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getData_id() == note.getData_id()) {
@@ -69,6 +103,9 @@ class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
         return -1;
     }
 
+    /**
+     * @brief inner class which act as the view holder.
+     */
     public class NotesViewholder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
         private TextView textViewContent;
@@ -95,6 +132,9 @@ class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewholder> {
         }
     }
 
+    /**
+     * @brief interface where the declaration of the method is done.
+     */
     public interface OnNoteItemClick {
         void onNoteClick(Note note, int position);
     }

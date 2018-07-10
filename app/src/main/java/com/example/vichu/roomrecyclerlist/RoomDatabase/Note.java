@@ -6,10 +6,12 @@
  * Author : Vishnu Muraleedharan.
  **/
 
-package com.example.vichu.roomrecyclerlist;
+package com.example.vichu.roomrecyclerlist.RoomDatabase;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+
+import com.example.vichu.roomrecyclerlist.constants.Constants;
 
 import java.io.Serializable;
 
