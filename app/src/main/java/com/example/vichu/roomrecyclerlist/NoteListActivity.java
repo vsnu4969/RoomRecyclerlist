@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +28,7 @@ import android.widget.Toast;
 import com.example.vichu.roomrecyclerlist.RoomDatabase.Note;
 import com.example.vichu.roomrecyclerlist.RoomDatabase.NoteDatabase;
 import com.example.vichu.roomrecyclerlist.adapter.NotesAdapter;
-import com.example.vichu.roomrecyclerlist.log.TraceLog;
+import com.example.vichu.roomrecyclerlist.utils.TraceLog;
 
 import java.util.List;
 
@@ -35,6 +36,9 @@ import java.util.List;
  * @brief NoteListActivity which is used to show the note list.
  */
 public class NoteListActivity extends AppCompatActivity implements NotesAdapter.OnNoteItemClick {
+    private EditText et_title,et_content;
+    Note note;
+    Button button;
    LinearLayout linearLayout;
     private TextView textViewMsg;
     private RecyclerView recyclerView;
@@ -75,6 +79,13 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
     public void onNoteClick(Note note, int clickedPosition) {
         RemoveTask removeTask = new RemoveTask(this);
         removeTask.execute(note);
+    }
+
+    @Override
+    public void onShortClick(Note note, int position) {
+        Intent intent=new Intent(this,NoteAddActivity.class);
+        intent.putExtra("current_object",note);
+        startActivity(intent);
     }
 
     private class RetrieveTask extends AsyncTask<Void, Void, List<Note>> {
@@ -163,15 +174,22 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
      */
     private void initUI() {
         TraceLog.entryLog();
+        final NoteDatabase noteDatabase=NoteDatabase.getInstance(this);
         textViewMsg = findViewById(R.id.text_list_empty);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingactionbar_addnote);
-        fab.setOnClickListener(new View.OnClickListener() {
+        et_title = findViewById(R.id.text_note_title);
+        et_content = findViewById(R.id.text_note_content);
+        Button button = findViewById(R.id.button_note_save);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), NoteAddActivity.class);
-                startActivity(intent);
+                // fetch data and create note object
+                note = new Note(et_content.getText().toString(), et_title.getText().toString());
+                // create worker thread to insert data into database
+                noteDatabase.noteDao().insert(note);
+                displayList();
             }
         });
+
         recyclerView = findViewById(R.id.recylerview_notelist);
         recyclerView.setLayoutManager(new LinearLayoutManager(NoteListActivity.this));
         notesAdapter = new NotesAdapter(NoteListActivity.this);

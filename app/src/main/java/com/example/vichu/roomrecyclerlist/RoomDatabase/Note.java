@@ -10,10 +10,13 @@ package com.example.vichu.roomrecyclerlist.RoomDatabase;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 
 import com.example.vichu.roomrecyclerlist.constants.Constants;
+import com.example.vichu.roomrecyclerlist.utils.DateRoomConverter;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  *
@@ -31,6 +34,15 @@ public class Note implements Serializable {
      **/
     @PrimaryKey(autoGenerate = true)
     private int data_id;
+
+
+    /**
+     *
+     *Brief:  information about the column
+     *
+     **/
+    @TypeConverters(DateRoomConverter.class)
+    private Date date;
 
     /**
      *
@@ -59,9 +71,20 @@ public class Note implements Serializable {
     public Note(String content, String title) {
         this.Content = content;
         this.title = title;
+        this.date = new Date(System.currentTimeMillis());
+
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     /**
+
      *
      *Brief:  getter for data_id
      *

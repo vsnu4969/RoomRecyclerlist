@@ -6,7 +6,7 @@
  * Author : Vishnu Muraleedharan.
  **/
 
-package com.example.vichu.roomrecyclerlist.log;
+package com.example.vichu.roomrecyclerlist.utils;
 
 import android.util.Log;
 

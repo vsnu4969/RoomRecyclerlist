@@ -10,7 +10,6 @@
 package com.example.vichu.roomrecyclerlist;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,9 +18,6 @@ import android.widget.EditText;
 
 import com.example.vichu.roomrecyclerlist.RoomDatabase.Note;
 import com.example.vichu.roomrecyclerlist.RoomDatabase.NoteDatabase;
-
-import java.io.Serializable;
-import java.lang.ref.WeakReference;
 
 /**
  * @brief   NoteAddActivity which is used to add and update the note list.
@@ -42,57 +38,27 @@ public class NoteAddActivity extends AppCompatActivity {
         et_title = findViewById(R.id.text_note_title);
         et_content = findViewById(R.id.text_note_content);
         noteDatabase = NoteDatabase.getInstance(NoteAddActivity.this);
+        Intent intent=getIntent();
+        note = (Note) intent.getSerializableExtra("current_object");
         Button button = findViewById(R.id.button_note_save);
-
+        et_title.setText(note.getTitle());
+        et_content.setText(note.getContent());
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // fetch data and create note object
-                note = new Note(et_content.getText().toString(), et_title.getText().toString());
-                // create worker thread to insert data into database
-                new InsertTask(NoteAddActivity.this,note).execute();
-            }
+                note.setTitle(et_title.getText().toString());
+                note.setContent(et_content.getText().toString());
+                updateNote(note);
+                }
         });
-
     }
 
     /**
-     * @brief setting the result for the NoteAddActivity.
+     * @brief Updating the note and gettin gbackto the note list.
      */
-    private void setResult(Note note, int flag){
-        setResult(flag,new Intent().putExtra("note", (Serializable) note));
-        finish();
+    private void updateNote(Note note) {
+        noteDatabase.noteDao().update(note);
+        this.finish();
     }
-
-    /**
-     * @brief inserting note in the database using asynctask.
-     */
-    private static class InsertTask extends AsyncTask<Void,Void,Boolean> {
-
-        private WeakReference<NoteAddActivity> activityReference;
-        private Note note;
-
-        // only retain a weak reference to the activity
-        InsertTask(NoteAddActivity context, Note note) {
-            activityReference = new WeakReference<>(context);
-            this.note = note;
-        }
-
-        // doInBackground methods runs on a worker thread
-        @Override
-        protected Boolean doInBackground(Void... objs) {
-            activityReference.get().noteDatabase.noteDao().insert(note);
-            return true;
-        }
-
-        // onPostExecute runs on main thread
-        @Override
-        protected void onPostExecute(Boolean bool) {
-            if (bool){
-                activityReference.get().setResult(note,1);
-            }
-        }
-
-    }
-
 }

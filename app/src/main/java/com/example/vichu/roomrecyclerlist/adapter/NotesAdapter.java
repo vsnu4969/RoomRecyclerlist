@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.example.vichu.roomrecyclerlist.NoteListActivity;
 import com.example.vichu.roomrecyclerlist.R;
 import com.example.vichu.roomrecyclerlist.RoomDatabase.Note;
+import com.example.vichu.roomrecyclerlist.utils.TraceLog;
 
 import java.util.List;
 
@@ -106,29 +107,40 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewhol
     /**
      * @brief inner class which act as the view holder.
      */
-    public class NotesViewholder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
+    public class NotesViewholder extends RecyclerView.ViewHolder implements View.OnLongClickListener,View.OnClickListener {
 
         private TextView textViewContent;
         private TextView textViewTitle;
+        private TextView getTextViewDate;
         private Note note;
 
         public NotesViewholder(View itemView) {
             super(itemView);
             itemView.setOnLongClickListener(this);
+            itemView.setOnClickListener(this);
             textViewContent = itemView.findViewById(R.id.item_text);
             textViewTitle = itemView.findViewById(R.id.tv_title);
+            getTextViewDate=itemView.findViewById(R.id.tv_date);
         }
 
         public void setData(Note note) {
             this.note = note;
             textViewTitle.setText(note.getTitle());
             textViewContent.setText(note.getContent());
+            getTextViewDate.setText(String.valueOf(note.getDate()));
         }
 
         @Override
         public boolean onLongClick(View view) {
             onNoteItemClick.onNoteClick(note, getAdapterPosition());
             return true;
+        }
+
+        @Override
+        public void onClick(View view) {
+            TraceLog.entryLog();
+            onNoteItemClick.onShortClick(note, getAdapterPosition());
+            TraceLog.exitLog();
         }
     }
 
@@ -137,5 +149,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewhol
      */
     public interface OnNoteItemClick {
         void onNoteClick(Note note, int position);
+        void onShortClick(Note note,int position);
     }
 }

@@ -21,7 +21,7 @@ import com.example.vichu.roomrecyclerlist.constants.Constants;
  * database version
  *
  **/
-@Database(entities = {Note.class}, version = 1)
+@Database(entities = {Note.class}, version = 2)
 public abstract class NoteDatabase extends RoomDatabase {
 
     /**
@@ -58,8 +58,11 @@ public abstract class NoteDatabase extends RoomDatabase {
      *
      **/
     private static NoteDatabase buildInstance(Context context) {
-        return Room.databaseBuilder(context, NoteDatabase.class, Constants.DB_NAME)
-                .allowMainThreadQueries().build();
+        return Room
+                .databaseBuilder(context, NoteDatabase.class, Constants.DB_NAME)
+                .fallbackToDestructiveMigration()
+                .allowMainThreadQueries()
+                .build();
     }
 
     /**
