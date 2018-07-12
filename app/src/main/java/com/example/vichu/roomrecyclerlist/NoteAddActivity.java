@@ -6,10 +6,11 @@
  * Author : Vishnu Muraleedharan.
  **/
 
-
 package com.example.vichu.roomrecyclerlist;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.EditText;
 
 import com.example.vichu.roomrecyclerlist.RoomDatabase.Note;
 import com.example.vichu.roomrecyclerlist.RoomDatabase.NoteDatabase;
+import com.example.vichu.roomrecyclerlist.utils.TraceLog;
 
 /**
  * @brief   NoteAddActivity which is used to add and update the note list.
@@ -55,10 +57,30 @@ public class NoteAddActivity extends AppCompatActivity {
     }
 
     /**
-     * @brief Updating the note and gettin gbackto the note list.
+     * @brief Updating the note and getting back to the note list.
      */
     private void updateNote(Note note) {
-        noteDatabase.noteDao().update(note);
+        //noteDatabase.noteDao().update(note);
+        new NoteUpdate(this,note).execute();
         this.finish();
+    }
+
+    private class NoteUpdate extends AsyncTask<Void,Void,Void>{
+        Context context;
+        Note note;
+
+        public NoteUpdate(Context context, Note note) {
+            this.context = context;
+            this.note = note;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            TraceLog.entryLog();
+            NoteDatabase noteDatabase=NoteDatabase.getInstance(context);
+            noteDatabase.noteDao().update(note);
+            TraceLog.exitLog();
+        return null;
+        }
     }
 }

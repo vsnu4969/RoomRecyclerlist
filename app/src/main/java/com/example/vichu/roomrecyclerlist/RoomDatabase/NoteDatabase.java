@@ -61,7 +61,6 @@ public abstract class NoteDatabase extends RoomDatabase {
         return Room
                 .databaseBuilder(context, NoteDatabase.class, Constants.DB_NAME)
                 .fallbackToDestructiveMigration()
-                .allowMainThreadQueries()
                 .build();
     }
 

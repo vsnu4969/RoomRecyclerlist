@@ -36,10 +36,10 @@ import java.util.List;
  * @brief NoteListActivity which is used to show the note list.
  */
 public class NoteListActivity extends AppCompatActivity implements NotesAdapter.OnNoteItemClick {
-    private EditText et_title,et_content;
+    private EditText et_title, et_content;
     Note note;
     Button button;
-   LinearLayout linearLayout;
+    LinearLayout linearLayout;
     private TextView textViewMsg;
     private RecyclerView recyclerView;
     private List<Note> notes;
@@ -53,7 +53,7 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_list_activity);
-        linearLayout=findViewById(R.id.linear_recycler_list_no_note);
+        linearLayout = findViewById(R.id.linear_recycler_list_no_note);
         initUI();
     }
 
@@ -83,8 +83,8 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
 
     @Override
     public void onShortClick(Note note, int position) {
-        Intent intent=new Intent(this,NoteAddActivity.class);
-        intent.putExtra("current_object",note);
+        Intent intent = new Intent(this, NoteAddActivity.class);
+        intent.putExtra("current_object", note);
         startActivity(intent);
     }
 
@@ -112,14 +112,13 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
             updateList(notes);
             TraceLog.exitLog();
 
-
         }
 
     }
 
-/**
- * @brief updating the list when no element vs when there is an element present.
- */
+    /**
+     * @brief updating the list when no element vs when there is an element present.
+     */
     private void updateList(List<Note> notes) {
         TraceLog.entryLog();
         TraceLog.log(Log.INFO, "List", "size : "
@@ -128,7 +127,7 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
             linearLayout.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             notesAdapter.setList(notes);
-            deleteNotes=notes;
+            deleteNotes = notes;
         } else {
             recyclerView.setVisibility(View.GONE);
             linearLayout.setVisibility(View.VISIBLE);
@@ -174,7 +173,7 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
      */
     private void initUI() {
         TraceLog.entryLog();
-        final NoteDatabase noteDatabase=NoteDatabase.getInstance(this);
+        final NoteDatabase noteDatabase = NoteDatabase.getInstance(this);
         textViewMsg = findViewById(R.id.text_list_empty);
         et_title = findViewById(R.id.text_note_title);
         et_content = findViewById(R.id.text_note_content);
@@ -185,8 +184,9 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
                 // fetch data and create note object
                 note = new Note(et_content.getText().toString(), et_title.getText().toString());
                 // create worker thread to insert data into database
-                noteDatabase.noteDao().insert(note);
-                displayList();
+                //noteDatabase.noteDao().insert(note);
+                insertNote(note);
+                //displayList();
             }
         });
 
@@ -197,9 +197,13 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         TraceLog.exitLog();
     }
 
+    private void insertNote(Note note) {
+
+        new InsertNote(this, note).execute();
+    }
+
     /**
      * @brief setting the menu inflater.
-     *
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -218,32 +222,102 @@ public class NoteListActivity extends AppCompatActivity implements NotesAdapter.
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch (id){
-            
+        switch (id) {
+
             case R.id.action_about:
                 Toast.makeText(this, "Vishnu Muraleedharan/nQuEST GLOBAL", Toast.LENGTH_LONG).show();
                 break;
             case R.id.action_delete_all:
                 DeleteAll();
-                
+
         }
-        
+
         return super.onOptionsItemSelected(item);
     }
 
     private void DeleteAll() {
 
-        NoteDatabase noteDatabase=NoteDatabase.getInstance(this);
-        if(noteDatabase.noteDao().getCount()> 0) {
-            noteDatabase.noteDao().deleteAll();
+//        NoteDatabase noteDatabase=NoteDatabase.getInstance(this);
+//        if(noteDatabase.noteDao().getCount()> 0) {
+//            noteDatabase.noteDao().deleteAll();
+        deleteAllNotes();
+//            displayList();
+//            Toast.makeText(this, " All notes Deleted", Toast.LENGTH_SHORT).show();
+    }
+
+    private void deleteAllNotes() {
+        new DeleteAllNotes(this).execute();
+    }
+//        else{
+//            Toast.makeText(this, " Nothing to Delete.", Toast.LENGTH_SHORT).show();
+//
+//        }
+
+    /**
+     * @brief asynctask for insert new note.
+     */
+    private class InsertNote extends AsyncTask<Void, Void, Void> {
+        Context context;
+        Note note;
+
+        public InsertNote(Context context, Note note) {
+            this.context = context;
+            this.note = note;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            TraceLog.entryLog();
+            NoteDatabase noteDatabase = NoteDatabase.getInstance(context);
+            noteDatabase.noteDao().insert(note);
+            TraceLog.exitLog();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            TraceLog.entryLog();
             displayList();
-            Toast.makeText(this, " All notes Deleted", Toast.LENGTH_SHORT).show();
+            TraceLog.exitLog();
         }
-        else{
-            Toast.makeText(this, " Nothing to Delete.", Toast.LENGTH_SHORT).show();
+    }
 
+    /**
+     * @brief AsyncTask class for delete all notes.
+     */
+    private class DeleteAllNotes extends AsyncTask<Void, String, Void> {
+
+        private Context context;
+
+        public DeleteAllNotes(Context context) {
+            this.context = context;
         }
 
+        @Override
+        protected Void doInBackground(Void... voids) {
+            TraceLog.entryLog();
+            NoteDatabase noteDatabase = NoteDatabase.getInstance(context);
+            if (noteDatabase.noteDao().getCount() > 0) {
+                noteDatabase.noteDao().deleteAll();
+                publishProgress("All notes Deleted");
+            } else {
+                publishProgress("Nothing to Delete.");
+            }
+            TraceLog.exitLog();
+            return null;
+        }
 
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            Toast.makeText(context, values[0], Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            TraceLog.entryLog();
+            displayList();
+            TraceLog.exitLog();
+        }
     }
 }
